@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Sign up - Sunlight Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="header">☀️ Sun Light Tracker & Solar Panel Cleaning Dashboard</div>
+
+  <div style="max-width:420px;margin:60px auto;padding:20px;background:white;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.06);">
+    <h2 style="margin-top:0;">Sign up</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom:10px;">
+          {% for category, msg in messages %}
+            <div style="padding:8px;border-radius:6px;margin-bottom:6px; background: {% if category=='danger' %}#ffe6e6{% elif category=='success' %}#e6ffea{% else %}#eef4fb{% endif %};">
+              {{ msg }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <label>Username</label><br>
+      <input name="username" required style="width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid #ddd;"><br>
+      <label>Password</label><br>
+      <input type="password" name="password" required style="width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid #ddd;"><br>
+
+      <button style="width:100%;padding:10px;background:#00a0ff;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Create account</button>
+    </form>
+
+    <p style="margin-top:14px;font-size:14px;">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,127 @@
+/* global */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f9;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* header */
+.header {
+  background: linear-gradient(135deg, #00a0ff, #00c6ff);
+  color: white;
+  padding: 16px 24px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* logged in info inside header */
+.header .meta {
+  float: right;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: -4px;
+}
+
+/* container */
+.container {
+  max-width: 1580px;
+  margin: 28px auto;
+  padding: 0 28px 60px 28px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+
+/* card */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 26px rgba(13, 34, 66, 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  cursor: pointer;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 36px rgba(13,34,66,0.08);
+}
+
+.card h3 {
+  margin: 4px 0 14px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #007bff;
+  margin-bottom: 12px;
+}
+
+/* Chart box inside card */
+.chart-box {
+  flex: 1;
+  background: #eef4fb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b97a6;
+  font-style: italic;
+  padding: 12px;
+}
+
+/* Cleaning card special */
+.cleaning-info {
+  font-size: 18px;
+  color: #007bff;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* small screens */
+@media (max-width: 1100px) {
+  .container { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .container { grid-template-columns: 1fr; padding: 12px; }
+  .header .meta { display: block; float: none; margin-top: 8px; }
+}
+
+/* details page style */
+.details-wrap {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px 80px;
+}
+.back-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+.history-table th, .history-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid #eee;
+}

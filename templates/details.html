@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Details - {{ title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="header">☀️ Sun Light Tracker & Solar Panel Cleaning Dashboard</div>
+
+  <div class="details-wrap">
+    <a class="back-link" href="{{ url_for('dashboard') }}">&larr; Back to Dashboard</a>
+    <h2 style="margin-top:4px;">{{ title }}</h2>
+
+    <div style="margin-top:12px;background:white;padding:18px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,0.06);">
+      <canvas id="bigChart" style="height:320px;"></canvas>
+    </div>
+
+    <div style="margin-top:18px;background:white;padding:14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,0.06);">
+      <h3>History</h3>
+      <table class="history-table">
+        <thead>
+          <tr><th>Timestamp</th><th>Value</th></tr>
+        </thead>
+        <tbody id="historyBody">
+          {% for row in history %}
+            <tr>
+              <td>{{ row['created_at'] }}</td>
+              <td>{{ row['value'] }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="2">No data available</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const FIELD = {{ field }};
+  async function fetchField(field, results=100) {
+    const resp = await fetch(`/api/field/${field}?results=${results}`);
+    if (!resp.ok) return null;
+    return await resp.json();
+  }
+
+  (async function init() {
+    const data = await fetchField(FIELD, 200);
+    if (!data) return;
+    const labels = (data.labels || []).map(l => new Date(l).toLocaleString());
+    const values = data.values.map(v => v === null ? null : parseFloat(v));
+
+    const ctx = document.getElementById('bigChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '',
+          data: values,
+          borderWidth: 2,
+          tension: 0.2,
+          pointRadius: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 45, minRotation: 30 } },
+          y: { beginAtZero: false }
+        }
+      }
+    });
+  })();
+</script>
+</body>
+</html>

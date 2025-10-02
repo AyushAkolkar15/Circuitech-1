@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard - Sunlight</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="header">
+    ☀️ Sun Light Tracker & Solar Panel Cleaning Dashboard
+    <div class="meta" style="color:white;">
+      {{ session['username'] }} | <a href="{{ url_for('logout') }}" style="color:white;text-decoration:underline;">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Card 1: Sunlight Intensity (Field 1) -->
+    <!--<div class="card" onclick="location.href='{{ url_for('details', field=1) }}'">
+      <h3>Current Sunlight Intensity</h3>
+      <div class="value" id="val1">-- Lux</div>
+      <div class="chart-box">
+        <canvas id="chart1" style="width:100%;height:160px;"></canvas>
+      </div>
+    </div> -->
+
+    <!-- Card 2: Panel Output (Field 2) -->
+    <div class="card" onclick="location.href='{{ url_for('details', field=2) }}'">
+      <h3>Solar Panel Output (V)</h3>
+      <div class="value" id="val2">-- V</div>
+      <div class="chart-box">
+        <canvas id="chart2" style="width:100%;height:160px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Card 3: Dust Level (Field 3) -->
+    <div class="card" onclick="location.href='{{ url_for('details', field=3) }}'">
+      <h3>Dust Level on Panel</h3>
+      <div class="value" id="val3">-- Cm</div>
+      <div class="chart-box">
+        <canvas id="chart3" style="width:100%;height:160px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Card 4: Cleaning Status (Field 4) -->
+    <div class="card" onclick="location.href='{{ url_for('details', field=4) }}'">
+      <h3>Cleaning Status</h3>
+      <div class="cleaning-info" id="val4">Idle</div>
+      <p>Last Cleaned: <span id="last_cleaned">--</span></p>
+    </div>
+  </div>
+
+<script>
+  // Utility to fetch JSON from our API
+  async function fetchField(field, results=30) {
+    const resp = await fetch(`/api/field/${field}?results=${results}`);
+    if (!resp.ok) return null;
+    return await resp.json();
+  }
+
+  // Create small sparkline-like charts for each card
+  async function initCard(field, chartId, valueElId, suffix="") {
+    const data = await fetchField(field, 30);
+    if (!data) return;
+    const labels = (data.labels || []).map(l => new Date(l).toLocaleTimeString());
+    const values = data.values.map(v => v === null ? null : parseFloat(v));
+
+    // Set latest value display (last non-null from end)
+    let latest = "--";
+    for (let i = values.length - 1; i >= 0; --i) {
+      if (values[i] !== null && !isNaN(values[i])) { latest = values[i]; break; }
+    }
+    const valEl = document.getElementById(valueElId);
+    if (valEl) {
+      valEl.textContent = (latest === "--") ? `${latest} ${suffix}` : `${latest} ${suffix}`;
+    }
+
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '',
+          data: values,
+          tension: 0.3,
+          fill: true,
+          pointRadius: 0,
+          borderWidth: 2,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        },
+        elements: { line: { borderColor: '#6fb3ff' }, point: { radius: 0 } }
+      }
+    });
+  }
+
+  // Initialize 3 numeric cards + cleaning status
+  initCard(1, 'chart1', 'val1', 'Lux');
+  initCard(2, 'chart2', 'val2', 'W');
+  initCard(3, 'chart3', 'val3', '%');
+
+  // For field 4, show last non-empty value and timestamp
+  (async function() {
+    const res = await fetchField(4, 20);
+    if (!res) return;
+    const values = res.values;
+    const labels = res.labels;
+    // find last non-null value
+    let latest = null, latestIdx = -1;
+    for (let i = values.length - 1; i >= 0; --i) {
+      if (values[i] !== null && values[i] !== "") { latest = values[i]; latestIdx = i; break; }
+    }
+    if (latest !== null) {
+      document.getElementById('val4').textContent = latest;
+      document.getElementById('last_cleaned').textContent = new Date(labels[latestIdx]).toLocaleString();
+    }
+  })();
+
+</script>
+
+</body>
+</html>
